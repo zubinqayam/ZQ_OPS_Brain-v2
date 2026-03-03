@@ -105,6 +105,7 @@ pub fn create_project(project: Project, state: State<AppState>) -> Result<Projec
 pub async fn send_innm_message(
     message: String,
     state: State<'_, AppState>,
+    app: tauri::AppHandle,
 ) -> Result<String, String> {
     // Record the user message
     {
@@ -119,7 +120,7 @@ pub async fn send_innm_message(
 
     // Attempt to call the sidecar; fall back to a local response when
     // the sidecar is not present (e.g. development without Python env).
-    let response = call_innm_sidecar(&message).await.unwrap_or_else(|_| {
+    let response = call_innm_sidecar(&app, &message).await.unwrap_or_else(|_| {
         format!(
             "INNM [offline]: received \"{}\".\n\
              Triangular Matrix engaged:\n\
@@ -150,7 +151,7 @@ pub fn map_woods_folder(
     folder_path: String,
     state: State<AppState>,
 ) -> Result<WoodsStatus, String> {
-    let count = count_documents(&folder_path);
+    let count = count_documents(std::path::Path::new(&folder_path));
     let status = WoodsStatus {
         mapped: true,
         folder_path: folder_path.clone(),
@@ -188,7 +189,7 @@ pub async fn select_folder_dialog(app: tauri::AppHandle) -> Result<Option<String
 /* ------------------------------------------------------------------ */
 
 /// Count documents with supported extensions under `root`.
-fn count_documents(root: &str) -> usize {
+fn count_documents(root: &std::path::Path) -> usize {
     let supported = ["txt", "md", "csv", "log"];
     let Ok(entries) = std::fs::read_dir(root) else {
         return 0;
@@ -200,9 +201,9 @@ fn count_documents(root: &str) -> usize {
         };
         let path = entry.path();
         if file_type.is_dir() {
-            // Do not follow symlinked directories: DirEntry::file_type() does not
-            // follow symlinks, so only real directories will recurse.
-            count += count_documents(&path.to_string_lossy());
+            // DirEntry::file_type() does not follow symlinks, so only real
+            // directories recurse — prevents stack overflows from symlink cycles.
+            count += count_documents(&path);
         } else if file_type.is_file() {
             if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
                 if supported.contains(&ext.to_lowercase().as_str()) {
@@ -214,34 +215,35 @@ fn count_documents(root: &str) -> usize {
     count
 }
 
-/// Call the INNM Python sidecar via stdin/stdout.
-async fn call_innm_sidecar(message: &str) -> Result<String, String> {
-    use tauri::api::process::{Command, CommandEvent};
+/// Call the INNM Python sidecar via stdin/stdout using Tauri's bundled-sidecar
+/// resolution so the correct `innm-engine-<target-triple>[.exe]` is found at
+/// runtime regardless of `PATH`.
+async fn call_innm_sidecar(app: &tauri::AppHandle, message: &str) -> Result<String, String> {
+    use tauri_plugin_shell::ShellExt;
+    use tauri_plugin_shell::process::CommandEvent;
 
-    // Resolve and spawn the bundled sidecar instead of relying on PATH.
-    let (mut rx, mut child) = Command::new_sidecar("innm-engine")
+    let (mut rx, mut child) = app
+        .shell()
+        .sidecar("innm-engine")
         .map_err(|e| e.to_string())?
         .spawn()
         .map_err(|e| e.to_string())?;
 
-    // Write the request message to the sidecar's stdin.
+    // Send the message to the sidecar via stdin.
     child
         .write(message.as_bytes())
         .map_err(|e| e.to_string())?;
 
-    // Collect all stdout output until the process terminates.
+    // Collect all stdout lines until the process terminates.
     let mut output = String::new();
     while let Some(event) = rx.recv().await {
         match event {
             CommandEvent::Stdout(line) => {
-                output.push_str(&line);
+                output.push_str(&String::from_utf8_lossy(&line));
             }
-            CommandEvent::Terminated(_) => {
-                break;
-            }
+            CommandEvent::Terminated(_) => break,
             _ => {
-                // Ignore other events (e.g., Stderr, Error) for now,
-                // preserving the previous "stdout-only" behavior.
+                // Ignore Stderr, Error, etc.
             }
         }
     }

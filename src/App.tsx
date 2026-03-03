@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type Dispatch, type SetStateAction } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { generateId, today, type Priority, type TaskStatus } from "./lib/utils";
 
@@ -136,7 +136,7 @@ function TodayTab({
   projects,
 }: {
   tasks: Task[];
-  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  setTasks: Dispatch<SetStateAction<Task[]>>;
   projects: Project[];
 }) {
   const [showForm, setShowForm] = useState(false);
@@ -273,7 +273,7 @@ function ProjectsTab({
   tasks,
 }: {
   projects: Project[];
-  setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
+  setProjects: Dispatch<SetStateAction<Project[]>>;
   tasks: Task[];
 }) {
   const [selected, setSelected] = useState<string | null>(null);
@@ -281,7 +281,7 @@ function ProjectsTab({
   const [newName, setNewName] = useState("");
   const [newDesc, setNewDesc] = useState("");
 
-  function addProject() {
+  async function addProject() {
     if (!newName.trim()) return;
     const p: Project = {
       id: generateId(),
@@ -291,6 +291,8 @@ function ProjectsTab({
       created_at: new Date().toISOString(),
       task_count: 0,
     };
+    const result = await safeInvoke("create_project", { project: p });
+    if (!result) return;
     setProjects((prev) => [...prev, p]);
     setNewName("");
     setNewDesc("");
@@ -424,7 +426,7 @@ function TasksTab({
   projects,
 }: {
   tasks: Task[];
-  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  setTasks: Dispatch<SetStateAction<Task[]>>;
   projects: Project[];
 }) {
   const [filter, setFilter] = useState<TaskStatus | "all">("all");

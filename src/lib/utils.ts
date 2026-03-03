@@ -75,7 +75,14 @@ export async function encryptSecret(
   combined.set(salt, 0);
   combined.set(iv, salt.byteLength);
   combined.set(new Uint8Array(ciphertext), salt.byteLength + iv.byteLength);
-  return btoa(String.fromCharCode(...combined));
+  // Chunked encoding avoids the argument-count limit of fromCharCode for
+  // large Uint8Arrays (spreading >65535 bytes throws in some JS engines).
+  let binary = "";
+  const CHUNK_SIZE = 0x8000;
+  for (let i = 0; i < combined.length; i += CHUNK_SIZE) {
+    binary += String.fromCharCode(...combined.subarray(i, i + CHUNK_SIZE));
+  }
+  return btoa(binary);
 }
 
 export async function decryptSecret(
