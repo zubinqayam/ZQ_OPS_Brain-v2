@@ -172,7 +172,14 @@ pub fn get_woods_status(state: State<AppState>) -> Result<WoodsStatus, String> {
 #[command]
 pub async fn select_folder_dialog(app: tauri::AppHandle) -> Result<Option<String>, String> {
     use tauri_plugin_dialog::DialogExt;
-    let path = app.dialog().file().blocking_pick_folder();
+    use tokio::task;
+
+    let app_handle = app.clone();
+    let path = task::spawn_blocking(move || {
+        app_handle.dialog().file().blocking_pick_folder()
+    })
+    .await
+    .map_err(|e| e.to_string())?;
     Ok(path.map(|p| p.to_string_lossy().into_owned()))
 }
 
