@@ -614,7 +614,7 @@ function InnmTab() {
     setMapping(true);
     try {
       const status = await safeInvoke<WoodsStatus>("map_woods_folder", {
-        folderPath: folderPath.trim(),
+        folder_path: folderPath.trim(),
       });
       if (status) setWoodsStatus(status);
     } finally {
