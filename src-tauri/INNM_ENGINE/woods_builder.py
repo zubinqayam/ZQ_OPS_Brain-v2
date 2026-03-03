@@ -99,16 +99,16 @@ class WoodsBuilder:
 
     def _walk(self, path: str) -> None:
         try:
-            entries = os.scandir(path)
+            with os.scandir(path) as entries:
+                for entry in entries:
+                    if entry.is_dir(follow_symlinks=False):
+                        self._walk(entry.path)
+                    elif entry.is_file():
+                        _, ext = os.path.splitext(entry.name)
+                        if ext.lower() in SUPPORTED_EXTENSIONS:
+                            self._index_file(entry.path, ext.lower())
         except PermissionError:
             return
-        for entry in entries:
-            if entry.is_dir(follow_symlinks=False):
-                self._walk(entry.path)
-            elif entry.is_file():
-                _, ext = os.path.splitext(entry.name)
-                if ext.lower() in SUPPORTED_EXTENSIONS:
-                    self._index_file(entry.path, ext.lower())
 
     def _index_file(self, file_path: str, extension: str) -> None:
         try:
