@@ -375,9 +375,34 @@ function ProjectsTab({
             {projectTasks.length === 0 && (
               <p className="text-muted text-sm">No tasks in this project.</p>
             )}
-            {projectTasks.map((t) => (
-              <TaskRow key={t.id} task={t} onToggle={() => {}} />
-            ))}
+            {projectTasks.length > 0 && (
+              <div className="task-list">
+                {projectTasks.map((t) => (
+                  <div key={t.id} className="task-row read-only">
+                    <div className="task-main">
+                      <span className="task-title">{t.title}</span>
+                      {t.description && (
+                        <span className="task-description text-muted text-sm">
+                          {" "}
+                          – {t.description}
+                        </span>
+                      )}
+                    </div>
+                    <div className="task-meta text-sm text-muted">
+                      <span className="task-status">{t.status}</span>
+                      <span className="task-priority" style={{ marginLeft: 8 }}>
+                        {t.priority}
+                      </span>
+                      {t.due_date && (
+                        <span className="task-due" style={{ marginLeft: 8 }}>
+                          Due: {t.due_date}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div className="card">
