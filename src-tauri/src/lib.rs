@@ -216,33 +216,35 @@ fn count_documents(root: &str) -> usize {
 
 /// Call the INNM Python sidecar via stdin/stdout.
 async fn call_innm_sidecar(message: &str) -> Result<String, String> {
-    use std::process::Stdio;
-    use tokio::io::{AsyncReadExt, AsyncWriteExt};
-    use tokio::process::Command;
+    use tauri::api::process::{Command, CommandEvent};
 
-    let mut child = Command::new("innm-engine")
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::null())
+    // Resolve and spawn the bundled sidecar instead of relying on PATH.
+    let (mut rx, mut child) = Command::new_sidecar("innm-engine")
+        .map_err(|e| e.to_string())?
         .spawn()
         .map_err(|e| e.to_string())?;
 
-    if let Some(mut stdin) = child.stdin.take() {
-        stdin
-            .write_all(message.as_bytes())
-            .await
-            .map_err(|e| e.to_string())?;
-    }
+    // Write the request message to the sidecar's stdin.
+    child
+        .write(message.as_bytes())
+        .map_err(|e| e.to_string())?;
 
+    // Collect all stdout output until the process terminates.
     let mut output = String::new();
-    if let Some(mut stdout) = child.stdout.take() {
-        stdout
-            .read_to_string(&mut output)
-            .await
-            .map_err(|e| e.to_string())?;
+    while let Some(event) = rx.recv().await {
+        match event {
+            CommandEvent::Stdout(line) => {
+                output.push_str(&line);
+            }
+            CommandEvent::Terminated(_) => {
+                break;
+            }
+            _ => {
+                // Ignore other events (e.g., Stderr, Error) for now,
+                // preserving the previous "stdout-only" behavior.
+            }
+        }
     }
-
-    child.wait().await.map_err(|e| e.to_string())?;
     Ok(output.trim().to_string())
 }
 
