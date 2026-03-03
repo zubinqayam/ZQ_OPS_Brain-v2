@@ -22,7 +22,7 @@ Matrix – Working Object Oriented Document Store) AI engine.
 
 ### ZQ Ops Brain
 - 📅 **Today Tab** – task management with priorities and due dates
-- 📁 **Projects Tab** – hierarchical folder structure
+- 📁 **Projects Tab** – project list view
 - ✅ **Tasks Tab** – full task view with search & filter
 - 💬 **Chat Tab** – INNM chat interface with Triangular Matrix
 - 🧠 **INNM Tab** – WOODS mapping, Matrix status, document indexing
