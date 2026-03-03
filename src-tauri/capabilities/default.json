@@ -7,9 +7,6 @@
     "core:default",
     "dialog:allow-open",
     "dialog:allow-pick-folder",
-    "fs:allow-read-recursive",
-    "fs:allow-write-recursive",
-    "shell:allow-execute",
-    "shell:allow-open"
+    "fs:allow-read-recursive"
   ]
 }
