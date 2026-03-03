@@ -234,12 +234,13 @@ async fn call_innm_sidecar(app: &tauri::AppHandle, message: &str) -> Result<Stri
         .write(message.as_bytes())
         .map_err(|e| e.to_string())?;
 
-    // Collect all stdout lines until the process terminates.
-    let mut output = String::new();
+    // Collect raw bytes from all Stdout events, then decode once to avoid
+    // repeated intermediate allocations from per-line from_utf8_lossy calls.
+    let mut raw: Vec<u8> = Vec::new();
     while let Some(event) = rx.recv().await {
         match event {
-            CommandEvent::Stdout(line) => {
-                output.push_str(&String::from_utf8_lossy(&line));
+            CommandEvent::Stdout(mut line) => {
+                raw.append(&mut line);
             }
             CommandEvent::Terminated(_) => break,
             _ => {
@@ -247,7 +248,7 @@ async fn call_innm_sidecar(app: &tauri::AppHandle, message: &str) -> Result<Stri
             }
         }
     }
-    Ok(output.trim().to_string())
+    Ok(String::from_utf8_lossy(&raw).trim().to_string())
 }
 
 /* ------------------------------------------------------------------ */
