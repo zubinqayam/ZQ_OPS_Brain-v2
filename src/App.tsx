@@ -161,7 +161,12 @@ function TodayTab({
       due_date: newDue || null,
       created_at: new Date().toISOString(),
     };
-    await safeInvoke("create_task", { task });
+    const result = await safeInvoke("create_task", { task });
+    if (!result) {
+      // Backend create_task failed; do not update local state to avoid desync.
+      // Optionally surface this error to the user or retry.
+      return;
+    }
     setTasks((prev) => [task, ...prev]);
     setNewTitle("");
     setShowForm(false);
