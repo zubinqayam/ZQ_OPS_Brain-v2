@@ -188,12 +188,19 @@ fn count_documents(root: &str) -> usize {
     };
     let mut count = 0usize;
     for entry in entries.flatten() {
+        let Ok(file_type) = entry.file_type() else {
+            continue;
+        };
         let path = entry.path();
-        if path.is_dir() {
+        if file_type.is_dir() {
+            // Do not follow symlinked directories: DirEntry::file_type() does not
+            // follow symlinks, so only real directories will recurse.
             count += count_documents(&path.to_string_lossy());
-        } else if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
-            if supported.contains(&ext.to_lowercase().as_str()) {
-                count += 1;
+        } else if file_type.is_file() {
+            if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
+                if supported.contains(&ext.to_lowercase().as_str()) {
+                    count += 1;
+                }
             }
         }
     }
