@@ -40,7 +40,7 @@ class FrontMatrix:
 
     def process(self, message: str) -> ParsedInput:
         """Parse a raw message string into a ParsedInput."""
-        tokens = re.findall(r"\w+", message.lower())
+        tokens = re.findall(r"\w+|\?", message.lower())
         intent, confidence = self._detect_intent(tokens)
         entities = self._extract_entities(message)
 
