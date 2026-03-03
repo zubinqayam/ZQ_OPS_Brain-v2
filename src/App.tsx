@@ -605,7 +605,7 @@ function InnmTab() {
   }, []);
 
   async function selectFolder() {
-    const path = await safeInvoke<string>("select_folder_dialog");
+    const path = await safeInvoke<string | null>("select_folder_dialog");
     if (path) setFolderPath(path);
   }
 
