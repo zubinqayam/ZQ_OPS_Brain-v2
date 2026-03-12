@@ -1,4 +1,7 @@
 {
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Default capability for ZQ Ops Brain main window",
   "$schema": "https://schemas.tauri.app/2/schema/capability",
   "identifier": "default",
   "description": "Default capability for ZQ Ops Brain v2",
@@ -6,6 +9,10 @@
   "permissions": [
     "core:default",
     "dialog:allow-open",
+    "dialog:allow-save",
+    "fs:allow-read-text-file",
+    "fs:allow-read-dir",
+    "fs:allow-exists"
     "dialog:allow-pick-folder",
     "fs:allow-read-recursive"
   ]

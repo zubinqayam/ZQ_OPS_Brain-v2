@@ -1,5 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
+  "productName": "ZQ Ops Brain",
+  "version": "2.0.0",
+  "identifier": "com.zq-ops.brain",
   "productName": "ZQ Ops Brain v2",
   "version": "2.0.0",
   "identifier": "com.zqops.brain.v2",
@@ -10,6 +13,11 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "windows": [
+      {
+        "title": "ZQ Ops Brain - INNM-WOSDS",
+        "width": 1200,
+        "height": 800,
     "withGlobalTauri": false,
     "windows": [
       {
@@ -23,6 +31,7 @@
       }
     ],
     "security": {
+      "csp": "default-src 'self'; connect-src 'self' ipc://localhost;"
       "csp": "default-src 'self'; img-src 'self' data:; media-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'"
     }
   },
