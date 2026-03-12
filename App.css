@@ -1,0 +1,245 @@
+/* INNM-WOSDS - Custom Styles */
+
+/* Base styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+/* Animation delays for bounce */
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+/* Matrix glow effects */
+.matrix-front {
+  box-shadow: 0 0 20px rgba(244, 63, 94, 0.3);
+}
+
+.matrix-back {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.matrix-up {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+/* Chat message animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-enter {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Processing indicator */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* Custom focus styles */
+input:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(225, 29, 72, 0.3);
+}
+
+/* Tab transitions */
+.tabs-content {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Button press effect */
+button:active {
+  transform: scale(0.98);
+}
+
+/* Input placeholder */
+::placeholder {
+  color: #71717a !important;
+  opacity: 1;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(225, 29, 72, 0.3);
+  color: #fff;
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Status indicator pulse */
+.status-pulse {
+  position: relative;
+}
+
+.status-pulse::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  opacity: 0;
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(24, 24, 27, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Matrix connection animation */
+@keyframes flow {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.matrix-line {
+  stroke-dasharray: 10;
+  animation: flow 2s linear infinite;
+}
+
+/* Toast notification override */
+[data-sonner-toast] {
+  --normal-bg: #18181b !important;
+  --normal-border: #27272a !important;
+  --normal-text: #e4e4e7 !important;
+}
+
+/* Scroll area override */
+[data-radix-scroll-area-viewport] {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
+
+/* Badge glow effects */
+.badge-glow-rose {
+  box-shadow: 0 0 10px rgba(225, 29, 72, 0.3);
+}
+
+.badge-glow-emerald {
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.badge-glow-blue {
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+/* Keyboard shortcut styling */
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  color: #a1a1aa;
+  background: #27272a;
+  border: 1px solid #3f3f46;
+  border-radius: 4px;
+  box-shadow: 0 1px 0 #18181b;
+}
+
+/* Loading shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    #27272a 25%,
+    #3f3f46 50%,
+    #27272a 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .matrix-viz {
+    transform: scale(0.7);
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

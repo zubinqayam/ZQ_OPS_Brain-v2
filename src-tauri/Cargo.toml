@@ -7,6 +7,14 @@ edition = "2021"
 
 [lib]
 name = "zq_ops_brain_lib"
+name = "zq-ops-brain-v2"
+version = "2.0.0"
+description = "ZQ Ops Brain v2 with INNM-WOSDS"
+authors = ["ZQ Ops"]
+edition = "2021"
+
+[lib]
+name = "zq_ops_brain_v2_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
@@ -25,4 +33,16 @@ codegen-units = 1
 lto = true
 opt-level = "s"
 panic = "abort"
+tauri-plugin-shell = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+tokio = { version = "1", features = ["full"] }
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
 strip = true
